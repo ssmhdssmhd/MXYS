@@ -1,0 +1,81 @@
+name: 自动同步 FongMi 上游分支
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # 每天 04:00 (UTC) 自动同步
+  workflow_dispatch: # 支持手动触发
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: 克隆本仓库（全量 refs）
+        run: |
+          git clone --bare "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo.git
+          git -C repo.git config http.postBuffer 524288000
+
+      - name: 同步 FongMi 各项目分支
+        run: |
+          set -uo pipefail
+          cd repo.git
+          fail=0
+          while IFS='|' read -r branch repo upbranch; do
+            if [ -z "$branch" ]; then continue; fi
+            echo "===== 同步 $branch <- FongMi/$repo:$upbranch ====="
+            if ! before=$(git rev-parse "refs/heads/$branch" 2>/dev/null); then
+              echo "skip: 分支 $branch 不存在"
+              continue
+            fi
+            if ! git fetch --quiet --no-tags "https://github.com/FongMi/$repo.git" "$upbranch"; then
+              echo "skip: fetch 失败 $repo"
+              fail=1
+              continue
+            fi
+            after=$(git rev-parse FETCH_HEAD)
+            if [ "$before" = "$after" ]; then
+              echo "已是最新: $branch"
+              continue
+            fi
+            if git merge-base --is-ancestor "$before" "$after" 2>/dev/null; then
+              if git push origin "$after:refs/heads/$branch" >/dev/null 2>&1; then
+                echo "已更新: $branch -> ${after:0:10}"
+              else
+                echo "push 失败: $branch"
+                fail=1
+              fi
+            else
+              echo "WARN: $branch 与上游已分叉（可能被本地改动），跳过，请手动合并处理"
+              fail=1
+            fi
+          done <<'EOF'
+          AutoClick|AutoClick|main
+          BeiDou-ijl15|BeiDou-ijl15|BeiDou
+          Box|Box|main
+          Brita|Brita|master
+          Calculator|Calculator|master
+          CatVodSpider|CatVodSpider|main
+          Cosmic|Cosmic|master
+          FFmpeg|FFmpeg|master
+          FongMi|FongMi|main
+          Launcher|Launcher|main
+          libplacebo|libplacebo|master
+          media|media|release
+          mpv|mpv|master
+          mpv-android|mpv-android|master
+          nodejs-mobile|nodejs-mobile|main
+          Painter|Painter|master
+          PainterObject|PainterObject|master
+          Release|Release|fongmi
+          Scan|Scan|main
+          TV|TV|fongmi
+          Xiaomi-Tools|Xiaomi-Tools|main
+          EOF
+          exit $fail
