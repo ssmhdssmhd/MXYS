@@ -32,6 +32,11 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: 配置 Python 3.10（Chaquopy 构建依赖）
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: 配置 Android SDK（内建 + 接受许可）
         run: |
           set -e
