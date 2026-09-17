@@ -8,3 +8,7 @@
 lib-*.aar
 /Release
 /docs
+
+# 签名 keystore（敏感，不入库）
+sign/
+*.keystore

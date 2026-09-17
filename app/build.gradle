@@ -5,9 +5,22 @@ plugins {
     alias libs.plugins.android.application
 }
 
-def localProps = new Properties()
-rootProject.file('local.properties').withInputStream {
-    localProps.load(it)
+def signingStoreFile = System.getenv('KFTV_KEYSTORE_FILE')
+def signingKeyAlias = System.getenv('KFTV_KEY_ALIAS')
+def signingStorePass = System.getenv('KFTV_STORE_PASS')
+def signingKeyPass = System.getenv('KFTV_KEY_PASS')
+
+// 未从环境变量(GitHub Secrets)取得时，回退读取 local.properties（本地构建）
+if (!signingStoreFile) {
+    def localProps = new Properties()
+    def localPropsFile = rootProject.file('local.properties')
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream { localProps.load(it) }
+        signingStoreFile = localProps['storeFile']
+        signingKeyAlias = localProps['keyAlias']
+        signingStorePass = localProps['storePassword']
+        signingKeyPass = localProps['storePassword']
+    }
 }
 
 android {
@@ -46,10 +59,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(localProps['storeFile'])
-            keyAlias localProps['keyAlias']
-            keyPassword localProps['storePassword']
-            storePassword localProps['storePassword']
+            storeFile file(signingStoreFile)
+            keyAlias signingKeyAlias
+            keyPassword signingKeyPass
+            storePassword signingStorePass
         }
     }
 
