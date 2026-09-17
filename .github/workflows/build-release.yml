@@ -32,8 +32,12 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: 配置 Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 配置 Android SDK（内建 + 接受许可）
+        run: |
+          set -e
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          yes | sdkmanager "platforms;android-37" "build-tools;37.0.0" >/dev/null 2>&1 || true
 
       - name: 恢复签名 keystore (来自 Secrets)
         run: |
