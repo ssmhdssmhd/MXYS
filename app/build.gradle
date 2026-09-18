@@ -97,23 +97,23 @@ android {
     }
 
     // 签名：优先读环境变量(GitHub Secrets 云编译)，回退读 gradle.properties(本地构建)
-    def storeFile = System.getenv('KFTV_KEYSTORE_FILE')
-    def keyAlias = System.getenv('KFTV_KEY_ALIAS')
-    def storePwd = System.getenv('KFTV_STORE_PASS')
-    def keyPwd = System.getenv('KFTV_KEY_PASS')
-    if (!storeFile && rootProject.hasProperty("RELEASE_STORE_FILE")) {
-        storeFile = rootProject.RELEASE_STORE_FILE
-        keyAlias = rootProject.hasProperty("RELEASE_KEY_ALIAS") ? rootProject.RELEASE_KEY_ALIAS : null
-        storePwd = rootProject.hasProperty("RELEASE_STORE_PASSWORD") ? rootProject.RELEASE_STORE_PASSWORD : null
-        keyPwd = rootProject.hasProperty("RELEASE_KEY_PASSWORD") ? rootProject.RELEASE_KEY_PASSWORD : null
+    def ksFile  = System.getenv('KFTV_KEYSTORE_FILE')
+    def ksAlias = System.getenv('KFTV_KEY_ALIAS')
+    def ksStorePwd = System.getenv('KFTV_STORE_PASS')
+    def ksKeyPwd = System.getenv('KFTV_KEY_PASS')
+    if (!ksFile && rootProject.hasProperty("RELEASE_STORE_FILE")) {
+        ksFile = rootProject.RELEASE_STORE_FILE
+        ksAlias = rootProject.hasProperty("RELEASE_KEY_ALIAS") ? rootProject.RELEASE_KEY_ALIAS : null
+        ksStorePwd = rootProject.hasProperty("RELEASE_STORE_PASSWORD") ? rootProject.RELEASE_STORE_PASSWORD : null
+        ksKeyPwd = rootProject.hasProperty("RELEASE_KEY_PASSWORD") ? rootProject.RELEASE_KEY_PASSWORD : null
     }
 
     signingConfigs {
         release {
-            storeFile storeFile ? file(storeFile) : null
-            keyAlias keyAlias
-            storePassword storePwd
-            keyPassword keyPwd
+            storeFile      ksFile ? file(ksFile) : null
+            keyAlias       ksAlias
+            storePassword  ksStorePwd
+            keyPassword    ksKeyPwd
         }
     }
 
