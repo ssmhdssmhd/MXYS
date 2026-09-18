@@ -1,16 +1,16 @@
-name: 构建发行版 MXGTV (TVBoxOS 底座)
+name: 构建发行版 沫兮TVBox (TVBoxOS 底座)
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: '版本号 (如 0.0.1 / 5.6.3)'
+        description: '版本号 (如 0.0.2)'
         required: true
-        default: '0.0.1'
+        default: '0.0.2'
       flavors:
-        description: '要构建的 flavor(逗号分隔，如 java64,java,java32)'
+        description: '要构建的 flavor(逗号分隔，如 leanback,mobile)'
         required: false
-        default: 'java64,java,java32'
+        default: 'leanback,mobile'
 
 permissions:
   contents: write
@@ -82,15 +82,15 @@ jobs:
           # 收集所有 release APK (TVBox_release-<flavor>.apk)
           find app/build/outputs -name "*.apk" -path "*release*" 2>/dev/null | while read f; do
             base=$(basename "$f")
-            # 提取 flavor：TVBox_release-java64.apk -> java64
+            # 提取 flavor：TVBox_release-leanback.apk -> leanback / mobile
             flavor=$(echo "$base" | sed -E 's/.*_release-([a-zA-Z0-9]+)\.apk/\1/')
-            cp "$f" "dist/MXGTV.${VER}.${TS}-${flavor}.apk"
+            cp "$f" "dist/MoxiTVBox.${VER}.${TS}-${flavor}.apk"
           done
           # 兜底：若输出命名不同，收集全部 release apk
           if [ -z "$(ls dist/*.apk 2>/dev/null)" ]; then
             for f in $(find app/build/outputs/apk -name "*.apk" 2>/dev/null); do
               flavor=$(basename "$(dirname "$f")")
-              cp "$f" "dist/MXGTV.${VER}.${TS}-${flavor}.apk"
+              cp "$f" "dist/MoxiTVBox.${VER}.${TS}-${flavor}.apk"
             done
           fi
           cd "$GITHUB_WORKSPACE"
@@ -108,13 +108,14 @@ jobs:
       - name: 创建 Release 并上传 APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "MXGTV.${{ inputs.version }}"
-          name: "MXGTV ${{ inputs.version }}"
+          tag_name: "MoxiTVBox.${{ inputs.version }}"
+          name: "沫兮TVBox ${{ inputs.version }}"
           body: |
-            ## MXGTV ${{ inputs.version }} 发行版 (TVBoxOS 底座)
+            ## 沫兮TVBox ${{ inputs.version }} 发行版 (TVBoxOS 底座)
             - 构建时间：`${{ env.TS }}` (UTC)
-            - Flavor：`${{ inputs.flavors }}`
+            - 版本：leanback(电视版) / mobile(手机版)
             - 由 GitHub Actions 云端自动编译、正式签名。
-            - 文件名：`MXGTV.${{ inputs.version }}.${{ env.TS }}-{flavor}.apk`
+            - 同名同签名可**覆盖更新**（升级安装）。
+            - 文件名：`MoxiTVBox.${{ inputs.version }}.${{ env.TS }}-{flavor}.apk`
           draft: true
           files: dist/*.apk

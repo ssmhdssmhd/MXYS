@@ -54,8 +54,10 @@
 仓库包含 **`KFTV`** 分支，用于影视二次开发，底座为 **TVBoxOS**（[q215613905/TVBoxOS](https://github.com/q215613905/TVBoxOS)），可纯开源云端构建：
 
 - **为什么换 TVBoxOS**：原 FongMi/TV 依赖上游**私有的 Media3 播放器 AAR（lib-*.aar，不入库）**，云端无法自编。TVBoxOS 使用标准 Google ExoPlayer，全依赖来自 Maven，**无私有 AAR，可云端构建**。
-- **构建变体（flavor）**：`java` / `java32` / `java64`（按 ABI；同时适配电视 + 手机）
-- **云端发行**：GitHub Actions 手动触发构建，APK 命名 `MXGTV.{版本号}.{时间}-{flavor}.apk`，发布到 **Releases** 供下载
+- **构建变体（flavor）**：`leanback`（电视版）/ `mobile`（手机版），各含 armv7+arm64
+- **应用名**：**沫兮TVBox**（电视版加载 TV 后缀）
+- **支持覆盖更新**：同一签名 + 固定包名，升级可覆盖安装
+- **云端发行**：GitHub Actions 手动触发构建，APK 命名 `MoxiTVBox.{版本号}.{时间}-{flavor}.apk`，发布到 **Releases** 供下载
 - **正式签名**：keystore 已安全存放于仓库 Secrets，签名文件不入库
 - 详见 KFTV 分支的 [README](https://github.com/ssmhdssmhd/MXYS/tree/KFTV/README.md)
 
@@ -65,9 +67,16 @@
 
 版本号规则：`v.0.0.1`，百位进一（如 `v.0.0.99` 之后为 `v.0.1.0`）
 
-当前版本：**v.0.0.1**
+当前版本：**v.0.0.2**
 
 ## 📝 更新日志
+
+### v.0.0.2 (2026-09-18)
+- ✅ 应用正式命名 **沫兮TVBox**，拆分为 **leanback（电视版）/ mobile（手机版）** 双版本
+- ✅ 电视版锁定横屏、手机版自适应；应用名/包名区分（`com.moxi.tvbox.tv` / `com.moxi.tvbox.mobile`）
+- ✅ 同一签名 + 固定包名，支持**覆盖更新**
+- ✅ 移除 Python(pyramid) 引擎，缩小云编译不确定面
+- 云编译 workflow 更新为默认构建 `leanback,mobile`，输出 `MoxiTVBox.{版本}.{时间}-{flavor}.apk`
 
 ### v.0.0.1 (2026-09-18)
 - ✅ MXGTV 0.0.1 云端编译**成功**并发布：`MXGTV.0.0.1.{时间}-java/java32/java64.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 可下载）
