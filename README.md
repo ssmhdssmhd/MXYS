@@ -67,9 +67,16 @@
 
 版本号规则：`v.0.0.1`，百位进一（如 `v.0.0.99` 之后为 `v.0.1.0`）
 
-当前版本：**v.0.0.2**
+当前版本：**v.0.0.3**
 
 ## 📝 更新日志
+
+### v.0.0.3 (2026-09-18)
+- ✅ **切换底座为 FongMi/TV（可云编全家桶）**：采用 `alantang1977/tangtv`（FongMi 私有 Media3 `1.11.0-alpha01-fongmi` AAR + mpv 原生库 + 坑模块 AAR 均已入库），原生 leanback/mobile，**可直接云端编译**
+- ✅ 应用名 **沫兮TVBox**（电视版 `沫兮TVBox-TV`）/ 包名 `com.moxi.tvbox.{tv,mobile}`，版本 v.0.0.3
+- ✅ **FongMi/tangtv 0.0.3 云端编译成功并发布**：`MoxiTVBox.0.0.3.{时间}-{mode}-arm64_v8a.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 可下载，约158MB含完整mpv/ffmpeg）
+- ✅ 云编环境：JDK21 / SDK37 / NDK28&29 / cmake3.22 / Python3.10(Chaquopy)；同名同签名可**覆盖更新**
+- ✳️ 说明：旧 MXTV（FongMi/TV 原版）因私有 media3 扩展未入库无法云编，已被此可云编基础替换；TVBoxOS 底座仍保留于 KFTV 分支可回退
 
 ### v.0.0.2 (2026-09-18)
 - ✅ **沫兮TVBox 0.0.2 云端编译成功并发布**：`MoxiTVBox.0.0.2.{时间}-leanback/mobile.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 可下载）
