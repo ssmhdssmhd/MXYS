@@ -72,6 +72,7 @@
 ## 📝 更新日志
 
 ### v.0.0.2 (2026-09-18)
+- ✅ **沫兮TVBox 0.0.2 云端编译成功并发布**：`MoxiTVBox.0.0.2.{时间}-leanback/mobile.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 可下载）
 - ✅ 应用正式命名 **沫兮TVBox**，拆分为 **leanback（电视版）/ mobile（手机版）** 双版本
 - ✅ 电视版锁定横屏、手机版自适应；应用名/包名区分（`com.moxi.tvbox.tv` / `com.moxi.tvbox.mobile`）
 - ✅ 同一签名 + 固定包名，支持**覆盖更新**
