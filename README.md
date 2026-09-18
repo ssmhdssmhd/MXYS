@@ -10,31 +10,41 @@
 - **其余分支**：FongMi 各上游项目的最新镜像分支，仅作功能参考与代码合并来源，**请勿直接修改这些分支**。
 - 所有镜像分支通过 GitHub Actions **每日自动同步上游最新代码**（也可手动触发）。
 
-## 📂 分支一览（FongMi 全部项目，共 21 个）
+## 📂 分支一览与用处（点击分支名可跳转）
 
-| 分支 | 上游项目 | 上游默认分支 | 说明 |
+### 🛠 自有开发 / 二开分支
+
+| 分支 | 用处 | 说明 |
+|---|---|---|
+| [main](https://github.com/ssmhdssmhd/MXYS/tree/main) | 二开主分支 | 仓库说明、云编译 Workflow、发行登记；二开改动请提交到此分支 |
+| [MXTV](https://github.com/ssmhdssmhd/MXYS/tree/MXTV) | **沫兮TVBox 当前云编基础** | 基于 FongMi/tangtv 全家桶（私有 Media3+mpv 已入库、可云编），电视(leanback)/手机(mobile) 双版本，云端构建发行版 |
+| [KFTV](https://github.com/ssmhdssmhd/MXYS/tree/KFTV) | **沫兮TVBox 备用基础** | 基于 TVBoxOS（纯开源、可云编、体积小），电视/手机双版本，作为轻量可回退版留存 |
+
+### 📦 FongMi 上游镜像分支（每日 04:00 UTC 自动同步，勿直接修改）
+
+| 分支 | 上游项目 | 默认分支 | 用处说明 |
 |---|---|---|---|
-| AutoClick | FongMi/AutoClick | main | AccessibilityService 自动点击示例 |
-| BeiDou-ijl15 | FongMi/BeiDou-ijl15 | BeiDou | 北斗定制分辨率客户端（v83 修改，fork） |
-| Box | FongMi/Box | main | Firebase 云存储使用示例 |
-| Brita | FongMi/Brita | master | Brita 使用历史 |
-| Calculator | FongMi/Calculator | master | ksoap2 使用示例 |
-| CatVodSpider | FongMi/CatVodSpider | main | 影视爬虫 Spider |
-| Cosmic | FongMi/Cosmic | master | MapleStory Global v83 服务端模拟器（fork） |
-| FFmpeg | FongMi/FFmpeg | master | FFmpeg 镜像（fork） |
-| FongMi | FongMi/FongMi | main | 作者主页仓库 |
-| Launcher | FongMi/Launcher | main | Android TV 桌面启动器示例 |
-| libplacebo | FongMi/libplacebo | master | libplacebo 官方镜像（fork） |
-| media | FongMi/media | release | 多媒体解码库（fork） |
-| mpv | FongMi/mpv | master | mpv 命令行媒体播放器（fork） |
-| mpv-android | FongMi/mpv-android | master | 基于 libmpv 的 Android 播放器（fork） |
-| nodejs-mobile | FongMi/nodejs-mobile | main | Android/iOS 嵌入式 Node.js（fork） |
-| Painter | FongMi/Painter | master | 绘画 |
-| PainterObject | FongMi/PainterObject | master | 绘画对象 |
-| Release | FongMi/Release | fongmi | 发布版本（APK 等产物） |
-| Scan | FongMi/Scan | main | 簡訊實聯制掃描 |
-| TV | FongMi/TV | fongmi | 影视TV（盒端播放器） |
-| Xiaomi-Tools | FongMi/Xiaomi-Tools | main | 小米工具 |
+| [AutoClick](https://github.com/ssmhdssmhd/MXYS/tree/AutoClick) | FongMi/AutoClick | main | AccessibilityService 自动点击示例 |
+| [BeiDou-ijl15](https://github.com/ssmhdssmhd/MXYS/tree/BeiDou-ijl15) | FongMi/BeiDou-ijl15 | BeiDou | 北斗定制分辨率客户端（v83 修改，fork） |
+| [Box](https://github.com/ssmhdssmhd/MXYS/tree/Box) | FongMi/Box | main | Firebase 云存储使用示例 |
+| [Brita](https://github.com/ssmhdssmhd/MXYS/tree/Brita) | FongMi/Brita | master | Brita 使用历史 |
+| [Calculator](https://github.com/ssmhdssmhd/MXYS/tree/Calculator) | FongMi/Calculator | master | ksoap2 使用示例 |
+| [CatVodSpider](https://github.com/ssmhdssmhd/MXYS/tree/CatVodSpider) | FongMi/CatVodSpider | main | 影视爬虫 Spider（接口/爬虫开发参考） |
+| [Cosmic](https://github.com/ssmhdssmhd/MXYS/tree/Cosmic) | FongMi/Cosmic | master | MapleStory Global v83 服务端模拟器（fork） |
+| [FFmpeg](https://github.com/ssmhdssmhd/MXYS/tree/FFmpeg) | FongMi/FFmpeg | master | FFmpeg 镜像（fork） |
+| [FongMi](https://github.com/ssmhdssmhd/MXYS/tree/FongMi) | FongMi/FongMi | main | 作者主页仓库 |
+| [Launcher](https://github.com/ssmhdssmhd/MXYS/tree/Launcher) | FongMi/Launcher | main | Android TV 桌面启动器示例 |
+| [libplacebo](https://github.com/ssmhdssmhd/MXYS/tree/libplacebo) | FongMi/libplacebo | master | libplacebo 官方镜像（fork） |
+| [media](https://github.com/ssmhdssmhd/MXYS/tree/media) | FongMi/media | release | 多媒体解码库（AndroidX Media3 / ExoPlayer fork） |
+| [mpv](https://github.com/ssmhdssmhd/MXYS/tree/mpv) | FongMi/mpv | master | mpv 命令行媒体播放器（fork） |
+| [mpv-android](https://github.com/ssmhdssmhd/MXYS/tree/mpv-android) | FongMi/mpv-android | master | 基于 libmpv 的 Android 播放器（fork） |
+| [nodejs-mobile](https://github.com/ssmhdssmhd/MXYS/tree/nodejs-mobile) | FongMi/nodejs-mobile | main | Android/iOS 嵌入式 Node.js（fork） |
+| [Painter](https://github.com/ssmhdssmhd/MXYS/tree/Painter) | FongMi/Painter | master | 绘画 |
+| [PainterObject](https://github.com/ssmhdssmhd/MXYS/tree/PainterObject) | FongMi/PainterObject | master | 绘画对象 |
+| [Release](https://github.com/ssmhdssmhd/MXYS/tree/Release) | FongMi/Release | fongmi | 上游发布版本（APK 等产物） |
+| [Scan](https://github.com/ssmhdssmhd/MXYS/tree/Scan) | FongMi/Scan | main | 簡訊實聯制掃描 |
+| [TV](https://github.com/ssmhdssmhd/MXYS/tree/TV) | FongMi/TV | fongmi | 影视TV 上游原版（盒端播放器，含私有 media3，云端不可自编，作参考） |
+| [Xiaomi-Tools](https://github.com/ssmhdssmhd/MXYS/tree/Xiaomi-Tools) | FongMi/Xiaomi-Tools | main | 小米工具 |
 
 ## 🔄 自动同步更新
 
