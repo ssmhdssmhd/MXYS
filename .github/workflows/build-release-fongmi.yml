@@ -38,24 +38,28 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 配置 Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: 安装 Android 平台/构建工具 (平台37用手动包)
+      - name: 安装 Android SDK 平台/构建工具/NDK/CMake
         run: |
           set -e
-          echo "$ANDROID_HOME"
-          sdkmanager "platform-tools" "platforms;android-28" "build-tools;36.0.0" >/dev/null 2>&1 || true
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          SDK="${SDK:-/usr/local/lib/android/sdk}"
+          echo "SDK=$SDK"
+          CMDBIN="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$CMDBIN" ] || CMDBIN="$SDK/cmdline-tools/16.0/bin/sdkmanager"
+          echo "sdkmanager=$CMDBIN"
+          yes | "$CMDBIN" --licenses >/dev/null 2>&1 || true
+          yes | "$CMDBIN" "platform-tools" "platforms;android-28" "build-tools;36.0.0" \
+            "ndk;28.2.13676358" "ndk;29.0.14206865" "cmake;3.22.1" >/dev/null 2>&1 || true
           # api 37 不在 sdkmanager 稳定通道，直接安装平台压缩包
           curl -fsSL -o /tmp/platform-37.zip https://dl.google.com/android/repository/platform-37.0_r01.zip
-          rm -rf /tmp/platform-37 "$ANDROID_HOME/platforms/android-37"
-          mkdir -p /tmp/platform-37 "$ANDROID_HOME/platforms"
+          rm -rf /tmp/platform-37 "$SDK/platforms/android-37"
+          mkdir -p /tmp/platform-37 "$SDK/platforms"
           unzip -q /tmp/platform-37.zip -d /tmp/platform-37
           pf="$(find /tmp/platform-37 -name android.jar -print -quit)"
           test -n "$pf"
-          mv "$(dirname "$pf")" "$ANDROID_HOME/platforms/android-37"
+          mv "$(dirname "$pf")" "$SDK/platforms/android-37"
           echo "platform-37 installed"
-          # AGP 9 自动下载 NDK(29/28) 与 cmake(3.22.1)；若失败后面按日志补
+          echo "sdk.dir=$SDK" >> local.properties
 
       - name: 恢复签名 keystore 并生成 local.properties
         run: |
@@ -66,6 +70,7 @@ jobs:
             chmod 600 sign/kftv-release.keystore
           fi
           {
+            echo "sdk.dir=${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
             echo "storeFile=${{ github.workspace }}/sign/kftv-release.keystore"
             echo "keyAlias=${{ secrets.KFTV_KEY_ALIAS }}"
             echo "storePassword=${{ secrets.KFTV_STORE_PASS }}"
