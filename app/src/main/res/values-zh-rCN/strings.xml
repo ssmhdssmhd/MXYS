@@ -2,7 +2,7 @@
 <resources xmlns:ns0="http://schemas.android.com/apk/res-auto">
 
     
-    <string name="app_name">湯影视</string>
+    <string name="app_name">沫兮TVBox</string>
    <string name="setting_app_branding">APP 图标</string>
     <string name="app_branding_icon_current">默认图标</string>
     <string name="app_branding_icon_history">原版图标</string>
