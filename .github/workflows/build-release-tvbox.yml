@@ -1,12 +1,15 @@
 name: 构建发行版 沫兮TVBox (TVBoxOS 底座)
 
 on:
+  # 每日定时自动构建 TV(leanback) + Mobile(mobile) 并发布
+  schedule:
+    - cron: '30 3 * * *'
   workflow_dispatch:
     inputs:
       version:
-        description: '版本号 (如 0.0.2)'
-        required: true
-        default: '0.0.2'
+        description: '版本号 (留空=自动读取 app/build.gradle 的 versionName)'
+        required: false
+        default: ''
       flavors:
         description: '要构建的 flavor(逗号分隔，如 leanback,mobile)'
         required: false
@@ -29,6 +32,23 @@ jobs:
         with:
           ref: KFTV
           submodules: false
+
+      - name: 解析版本号 (自动/手动)
+        id: ver
+        run: |
+          set -e
+          TS=$(date -u +%Y%m%d%H%M)
+          VER_IN="${{ inputs.version }}"
+          if [ -z "$VER_IN" ]; then
+            VER=$(grep -oP '(?<=versionName ")[^"]+' app/build.gradle | head -1 || true)
+            VER="${VER:-0.0.2}"
+            echo "模式：自动(定时) 版本=$VER"
+          else
+            VER="$VER_IN"
+            echo "模式：手动 版本=$VER"
+          fi
+          echo "VER=$VER" >> "$GITHUB_ENV"
+          echo "TS=$TS" >> "$GITHUB_ENV"
 
       - name: 配置 JDK 17 (AGP 7.2.2 兼容)
         uses: actions/setup-java@v4
@@ -76,8 +96,8 @@ jobs:
       - name: 按发版规则重命名 APK
         run: |
           set -e
-          VER="${{ inputs.version }}"
-          TS=$(date -u +%Y%m%d%H%M)
+          VER="${{ env.VER }}"
+          TS="${{ env.TS }}"
           mkdir -p dist
           # 收集所有 release APK (TVBox_release-<flavor>.apk)
           find app/build/outputs -name "*.apk" -path "*release*" 2>/dev/null | while read f; do
@@ -96,7 +116,6 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           echo "=== 产物列表 ==="
           ls -la dist/
-          echo "TS=$TS" >> "$GITHUB_ENV"
           echo "APK_COUNT=$(ls dist/*.apk 2>/dev/null | wc -l)" >> "$GITHUB_ENV"
 
       - name: 校验 keystore 残留并清理 (安全)
@@ -108,14 +127,14 @@ jobs:
       - name: 创建 Release 并上传 APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "MoxiTVBox.${{ inputs.version }}"
-          name: "沫兮TVBox ${{ inputs.version }}"
+          tag_name: "MoxiTVBox.${{ env.VER }}.${{ env.TS }}"
+          name: "沫兮TVBox ${{ env.VER }}"
           body: |
-            ## 沫兮TVBox ${{ inputs.version }} 发行版 (TVBoxOS 底座)
+            ## 沫兮TVBox ${{ env.VER }} 发行版 (TVBoxOS 底座)
             - 构建时间：`${{ env.TS }}` (UTC)
-            - 版本：leanback(电视版) / mobile(手机版)
+            - TV：leanback(电视版) + Mobile：mobile(手机版)
             - 由 GitHub Actions 云端自动编译、正式签名。
             - 同名同签名可**覆盖更新**（升级安装）。
-            - 文件名：`MoxiTVBox.${{ inputs.version }}.${{ env.TS }}-{flavor}.apk`
+            - 文件名：`MoxiTVBox.${{ env.VER }}.${{ env.TS }}-{flavor}.apk`
           draft: true
           files: dist/*.apk
