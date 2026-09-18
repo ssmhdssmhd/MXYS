@@ -44,19 +44,22 @@
 
 ## 🛠 二开流程建议
 
-1. 影视二开请使用 **`KFTV`** 分支（基于 FongMi/TV，支持云端构建发行版）。
-2. 从功能分支合并上游功能：`git merge TV` 或 `git merge CatVodSpider` 等
-3. 在 KFTV 上进行修改开发
-4. 按版本规则更新版本号与更新日志，提交并推送
+1. 影视二开请使用 **`KFTV`** 分支（基于 TVBoxOS，支持云端构建发行版）。
+2. 在 KFTV 上进行修改开发
+3. 按版本规则更新版本号与更新日志，提交并推送
+4. 在 Actions 手动触发云编译，产物发布到 Releases 供下载
 
 ## 🎬 KFTV 开发分支（影视二开）
 
-仓库包含 **`KFTV`** 分支，用于基于 FongMi/TV 的影视二次开发：
+仓库包含 **`KFTV`** 分支，用于影视二次开发，底座为 **TVBoxOS**（[q215613905/TVBoxOS](https://github.com/q215613905/TVBoxOS)），可纯开源云端构建：
 
-- **构建变体**：`leanback`（电视版）+ `mobile`（手机版）
-- **云端发行**：GitHub Actions 手动触发构建，APK 命名 `MXGTV.{版本号} {时间}-{设备}.apk`，发布到 **Releases** 供下载
+- **为什么换 TVBoxOS**：原 FongMi/TV 依赖上游**私有的 Media3 播放器 AAR（lib-*.aar，不入库）**，云端无法自编。TVBoxOS 使用标准 Google ExoPlayer，全依赖来自 Maven，**无私有 AAR，可云端构建**。
+- **构建变体（flavor）**：`java` / `java32` / `java64`（按 ABI；同时适配电视 + 手机）
+- **云端发行**：GitHub Actions 手动触发构建，APK 命名 `MXGTV.{版本号}.{时间}-{flavor}.apk`，发布到 **Releases** 供下载
 - **正式签名**：keystore 已安全存放于仓库 Secrets，签名文件不入库
 - 详见 KFTV 分支的 [README](https://github.com/ssmhdssmhd/MXYS/tree/KFTV/README.md)
+
+> 注：`TV` / `CatVodSpider` / `Release` 等仍作为 FongMi 上游**镜像分支**保留（由 sync 自动同步），可作功能参考与合并来源。
 
 ## 版本
 
@@ -66,9 +69,14 @@
 
 ## 📝 更新日志
 
+### v.0.0.1 (2026-09-18)
+- KFTV 二开底座由 FongMi/TV 切换为 **TVBoxOS**（解决私有 AAR 无法云编译问题）
+- 云编译 workflow 更新：构建 java/java32/java64，命名 `MXGTV.{版本}.{时间}-{flavor}.apk`
+- 发布 MXGTV 5.6.3 初始发行版（上游打包版，供先期下载）
+
 ### v.0.0.1 (2026-09-17)
 - 初始化二开仓库
 - 拉取 FongMi 全部 21 个项目至独立镜像分支
 - 添加 GitHub Actions 自动同步上游 workflow
 - main 分支添加二开仓库说明
-- 新增 KFTV 二开分支（基于 FongMi/TV），配置云端构建 + 签名 + 发行版
+- 新增 KFTV 二开分支
