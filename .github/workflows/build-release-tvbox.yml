@@ -45,6 +45,19 @@ jobs:
             chmod 600 sign/kftv-release.keystore
           fi
 
+      - name: 生成 local.properties (定位 CI Android SDK)
+        run: |
+          set -e
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          echo "ANDROID_HOME=${ANDROID_HOME:-unset}  ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-unset}"
+          if [ -z "$SDK" ]; then SDK="$ANDROID_SDK_ROOT"; fi
+          if [ -z "$SDK" ]; then
+            # 兜底：标准 GH runner 安装路径
+            SDK="/usr/local/lib/android/sdk"
+          fi
+          echo "sdk.dir=${SDK}" > local.properties
+          cat local.properties
+
       - name: 构建 flavor (${{ inputs.flavors }})
         env:
           KFTV_KEYSTORE_FILE: ${{ github.workspace }}/sign/kftv-release.keystore
