@@ -70,9 +70,10 @@
 ## 📝 更新日志
 
 ### v.0.0.1 (2026-09-18)
+- ✅ MXGTV 0.0.1 云端编译**成功**并发布：`MXGTV.0.0.1.{时间}-java/java32/java64.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 可下载）
 - KFTV 二开底座由 FongMi/TV 切换为 **TVBoxOS**（解决私有 AAR 无法云编译问题）
-- 云编译 workflow 更新：构建 java/java32/java64，命名 `MXGTV.{版本}.{时间}-{flavor}.apk`
-- 发布 MXGTV 5.6.3 初始发行版（上游打包版，供先期下载）
+- 修复签名变量命名冲突 & CI 缺 `local.properties` 导致的编译失败
+- 云编译 workflow：构建 java/java32/java64，正式签名，发布 Releases
 
 ### v.0.0.1 (2026-09-17)
 - 初始化二开仓库
