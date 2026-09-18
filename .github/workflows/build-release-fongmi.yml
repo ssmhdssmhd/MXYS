@@ -36,10 +36,10 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: 配置 Python (Chaquopy 17 需要)
+      - name: 配置 Python (Chaquopy 17 需 Python 3.10)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.10'
 
       - name: 安装 Android SDK 平台 37 / Build-Tools / NDK
         run: |
