@@ -2623,4 +2623,45 @@ TVData</string>
     <string name="setting_ad_probe_revision">Revision %1$d · %2$d rules</string>
     <string name="setting_ad_probe_never">Never fetched</string>
     <string name="setting_ad_probe_url_invalid">The rule source must start with https://</string>
-    <string name="setting_ad_probe_source_disabled">Set a community rule source first</string></resources>
+    <string name="setting_ad_probe_source_disabled">Set a community rule source first</string>
+    <string name="setting_ad_group_direct">Direct Interface</string>
+    <string name="setting_direct_interface">Direct Interface (all .m3u8 via interface)</string>
+    <string name="setting_direct_interface_url">Interface URL</string>
+    <string name="setting_direct_interface_url_hint">All .m3u8 playlists will be sent to this interface for ad removal. Leave empty to disable.</string>
+    <string name="setting_site_rule_manage">Site Rules</string>
+    <string name="setting_site_rule_count">%1$d rules</string>
+    <string name="site_rule_add">Add rule</string>
+    <string name="site_rule_edit">Edit rule</string>
+    <string name="site_rule_remove">Delete rule</string>
+    <string name="site_rule_enable">Enable</string>
+    <string name="site_rule_disable">Disable</string>
+    <string name="site_rule_test">Online test</string>
+    <string name="site_rule_test_url">Video link</string>
+    <string name="site_rule_test_hint">Analyze m3u8 link and auto-generate candidate rule</string>
+    <string name="site_rule_test_running">Analyzing (downloading m3u8 &amp; samples)…</string>
+    <string name="site_rule_test_done">Done: %1$d segments, %2$d anomaly groups, %3$d discontinuity</string>
+    <string name="site_rule_test_failed">Analysis failed: %1$s</string>
+    <string name="site_rule_saved">Rule saved</string>
+    <string name="site_rule_deleted">Rule deleted</string>
+    <string name="site_rule_sync">Sync to repository</string>
+    <string name="site_rule_sync_done">Synced to GZ folder</string>
+    <string name="site_rule_sync_fail">Sync failed: %1$s</string>
+    <string name="site_rule_sync_config">Sync config</string>
+    <string name="site_rule_sync_repo">Repository (owner/name)</string>
+    <string name="site_rule_sync_token">Token (GitHub)</string>
+    <string name="site_rule_sync_path">Path (default GZ/rules.json)</string>
+    <string name="site_rule_field_domain">Site domain</string>
+    <string name="site_rule_field_detect_type">Detect type</string>
+    <string name="site_rule_field_detect_method">Detect method</string>
+    <string name="site_rule_field_index_mode">Index mode</string>
+    <string name="site_rule_field_bitrate">Bitrate</string>
+    <string name="site_rule_field_fixed_path">Fixed sub-path (index=fixed)</string>
+    <string name="site_rule_field_proxy">Site proxy (empty=pool, -=force direct)</string>
+    <string name="site_rule_field_cache_dir">Cache sub-dir</string>
+    <string name="site_rule_field_sort_code">Sort code</string>
+    <string name="site_rule_field_url_prefixes">URL match prefixes (one per line)</string>
+    <string name="site_rule_field_url_regexes">URL match regexes (one per line)</string>
+    <string name="site_rule_field_fingerprints">Ad duration fingerprints (one group per line)</string>
+    <string name="site_rule_field_ad_regexes">Ad filter regexes (one per line)</string>
+    <string name="site_rule_invalid">Missing domain, cannot save</string>
+</resources>

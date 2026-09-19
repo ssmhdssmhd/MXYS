@@ -800,6 +800,50 @@ public class Setting {
         Prefers.put("adblock", adblock);
     }
 
+    // ---- 直走接口（默认关闭）：所有 .m3u8 走配置的接口去广告 ----
+
+    public static boolean isDirectInterface() {
+        return Prefers.getBoolean("direct_interface_enabled", false);
+    }
+
+    public static void putDirectInterface(boolean enabled) {
+        Prefers.put("direct_interface_enabled", enabled);
+    }
+
+    public static String getDirectInterfaceUrl() {
+        return Prefers.getString("direct_interface_url", "");
+    }
+
+    public static void putDirectInterfaceUrl(String url) {
+        Prefers.put("direct_interface_url", url == null ? "" : url.trim());
+    }
+
+    // ---- 资源站规则远程同步（公开仓库 GZ 文件夹） ----
+
+    public static String getRuleSyncRepo() {
+        return Prefers.getString("rule_sync_repo", "ssmhdssmhd/webhtv-backup");
+    }
+
+    public static void putRuleSyncRepo(String repo) {
+        Prefers.put("rule_sync_repo", repo == null ? "" : repo.trim());
+    }
+
+    public static String getRuleSyncToken() {
+        return Prefers.getString("rule_sync_token", "");
+    }
+
+    public static void putRuleSyncToken(String token) {
+        Prefers.put("rule_sync_token", token == null ? "" : token.trim());
+    }
+
+    public static String getRuleSyncPath() {
+        return Prefers.getString("rule_sync_path", "GZ/rules.json");
+    }
+
+    public static void putRuleSyncPath(String path) {
+        Prefers.put("rule_sync_path", path == null ? "" : path.trim());
+    }
+
     public static boolean isZhuyin() {
         return Prefers.getBoolean("zhuyin");
     }

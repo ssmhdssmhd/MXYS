@@ -2588,4 +2588,45 @@ TVData</string>
     <string name="setting_ad_probe_revision">revision %1$d · %2$d 條規則</string>
     <string name="setting_ad_probe_never">尚未拉取</string>
     <string name="setting_ad_probe_url_invalid">規則源必須以 https:// 開頭</string>
-    <string name="setting_ad_probe_source_disabled">請先填寫社群規則源位址</string></resources>
+    <string name="setting_ad_probe_source_disabled">請先填寫社群規則源位址</string>
+    <string name="setting_ad_group_direct">直走介面</string>
+    <string name="setting_direct_interface">直走介面（所有 .m3u8 走介面）</string>
+    <string name="setting_direct_interface_url">直走介面位址</string>
+    <string name="setting_direct_interface_url_hint">開啟後所有 .m3u8 播放都會交給該介面去廣告，留空則關閉。介面需回傳清洗後的 m3u8 清單。</string>
+    <string name="setting_site_rule_manage">資源站規則</string>
+    <string name="setting_site_rule_count">%1$d 條規則</string>
+    <string name="site_rule_add">新增規則</string>
+    <string name="site_rule_edit">編輯規則</string>
+    <string name="site_rule_remove">刪除規則</string>
+    <string name="site_rule_enable">啟用</string>
+    <string name="site_rule_disable">停用</string>
+    <string name="site_rule_test">線上測試</string>
+    <string name="site_rule_test_url">影片連結</string>
+    <string name="site_rule_test_hint">分析 m3u8 連結並自動產生候選規則（需下載清單與取樣片段）</string>
+    <string name="site_rule_test_running">分析中（下載 m3u8 與取樣片段）…</string>
+    <string name="site_rule_test_done">分析完成：%1$d 個片段，%2$d 組異常時長，%3$d 處斷點</string>
+    <string name="site_rule_test_failed">分析失敗：%1$s</string>
+    <string name="site_rule_saved">規則已儲存</string>
+    <string name="site_rule_deleted">規則已刪除</string>
+    <string name="site_rule_sync">同步到倉庫</string>
+    <string name="site_rule_sync_done">已同步到 GZ 資料夾</string>
+    <string name="site_rule_sync_fail">同步失敗：%1$s</string>
+    <string name="site_rule_sync_config">同步設定</string>
+    <string name="site_rule_sync_repo">倉庫（owner/name）</string>
+    <string name="site_rule_sync_token">Token（GitHub）</string>
+    <string name="site_rule_sync_path">路徑（預設 GZ/rules.json）</string>
+    <string name="site_rule_field_domain">資源站網域</string>
+    <string name="site_rule_field_detect_type">檢測/解析類型</string>
+    <string name="site_rule_field_detect_method">檢測方式</string>
+    <string name="site_rule_field_index_mode">索引方式</string>
+    <string name="site_rule_field_bitrate">碼率選擇</string>
+    <string name="site_rule_field_fixed_path">固定子路徑（索引=fixed 時生效）</string>
+    <string name="site_rule_field_proxy">站點級出網代理（留空=按代理池，填 -=強制直連）</string>
+    <string name="site_rule_field_cache_dir">快取子目錄</string>
+    <string name="site_rule_field_sort_code">排序碼</string>
+    <string name="site_rule_field_url_prefixes">URL 匹配前綴（每行一個）</string>
+    <string name="site_rule_field_url_regexes">URL 匹配正則（每行一個）</string>
+    <string name="site_rule_field_fingerprints">廣告時長指紋（每行一組，如 5.567, 3.2）</string>
+    <string name="site_rule_field_ad_regexes">廣告過濾正則（每行一個）</string>
+    <string name="site_rule_invalid">缺少網域，無法儲存</string>
+</resources>
