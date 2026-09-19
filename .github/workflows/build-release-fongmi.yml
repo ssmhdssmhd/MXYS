@@ -141,5 +141,4 @@ jobs:
             - 构建时间：`${{ env.TS }}` (UTC)
             - TV：leanback(电视版) + Mobile：mobile(手机版)，arm64
             - 云端编译、正式签名，同名同签名可覆盖更新
-          draft: true
           files: dist/*.apk

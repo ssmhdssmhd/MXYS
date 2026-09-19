@@ -136,5 +136,4 @@ jobs:
             - 由 GitHub Actions 云端自动编译、正式签名。
             - 同名同签名可**覆盖更新**（升级安装）。
             - 文件名：`MoxiTVBox.${{ env.VER }}.${{ env.TS }}-{flavor}.apk`
-          draft: true
           files: dist/*.apk
