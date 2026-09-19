@@ -88,16 +88,20 @@
 
 版本号规则：`v.0.0.1`，百位进一（如 `v.0.0.99` 之后为 `v.0.1.0`）
 
-当前版本：**v.0.0.4**
+当前版本：**v.0.0.5**
 
 ## 📝 更新日志
 
+### v.0.0.5 (2026-09-19)
+- ✅ **发行版整理**：清理全部历史杂散 Release（0.0.2/0.0.3/0.0.4 重复包、MXGTV 旧版、空包），**只保留当前 0.0.5 一个正式发行版**，版本号与 README 严格一致
+- ✅ 版本升至 v0.0.5（versionCode 565），APK 命名 `MoxiTVBox.{版本}.{时间}-{flavor}.apk`
+- ✅ 签名已校验为 **v1+v2+v3** 齐全（`META-INF/CERT.RSA` v1 签名存在 + v2/v3 签名块）
+- 发布包：`MoxiTVBox.0.0.5.{时间}-leanback/mobile-arm64_v8a.apk`
+
 ### v.0.0.4 (2026-09-19)
-- ✅ 修复**安装包无法安装**问题：原包为纯 v2 签名，老设备/部分国产 ROM/电视盒子报「软件包似乎无效、缺开发者证书」→ 已强制启用 **v1+v2+v3 签名**（`app/build.gradle`），实测 `signed_v1/v2/v3=True`，兼容所有 Android 版本
-- ✅ 编译版本号对齐 0.0.4（versionCode 564），与文档一致
-- ✅ README 新增「发行版编译来源」说明：当前正式版编译自 **MXTV 分支**（build-release-fongmi.yml），备用版编译自 KFTV 分支
-- ✅ 修复中文环境下应用名显示为「湯影视」的问题：main / leanback 的 `values-zh-rCN`、`values-zh-rTW` 中 `app_name` 统一覆盖为 **沫兮TVBox / 沫兮TVBox-TV**
-- 发布包：`MoxiTVBox.0.0.4.{时间}-{mode}-arm64_v8a.apk`
+- ✅ 修复**安装包无法安装**问题：强制启用 **v1+v2+v3 签名**（`app/build.gradle`），兼容所有 Android 版本
+- ✅ 修复中文环境下应用名显示为「湯影视」的问题：`app_name` 统一为 **沫兮TVBox / 沫兮TVBox-TV**
+- ✅ README 新增「发行版编译来源」说明
 
 ### v.0.0.3 (2026-09-18)
 - ✅ **切换底座为 FongMi/TV（可云编全家桶）**：采用 `alantang1977/tangtv`（FongMi 私有 Media3 `1.11.0-alpha01-fongmi` AAR + mpv 原生库 + 坑模块 AAR 均已入库），原生 leanback/mobile，**可直接云端编译**
