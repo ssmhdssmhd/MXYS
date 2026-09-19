@@ -30,7 +30,9 @@ import com.fongmi.android.tv.ad.audio.SpeechAdConfig;
 import com.fongmi.android.tv.ad.audio.SpeechAdSetting;
 import com.fongmi.android.tv.api.config.ImportedAdRuleCandidateStore;
 import com.fongmi.android.tv.api.config.RuleConfig;
+import com.fongmi.android.tv.api.config.SiteRuleConfig;
 import com.fongmi.android.tv.api.config.UserAdRuleStore;
+import com.fongmi.android.tv.bean.SiteRule;
 import com.fongmi.android.tv.databinding.FragmentSettingAdBinding;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.service.PlaybackService;
@@ -40,12 +42,17 @@ import com.fongmi.android.tv.subtitle.RealtimeSubtitleSpeechRecognitionFactory;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.AdBlockStatsDialog;
 import com.fongmi.android.tv.ui.dialog.AdRuleManageDialog;
+import com.fongmi.android.tv.ui.dialog.LightDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.RuleSync;
+import com.fongmi.android.tv.utils.SiteRuleAnalyzer;
 import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class SettingAdFragment extends BaseFragment {
@@ -105,6 +112,9 @@ public class SettingAdFragment extends BaseFragment {
         mBinding.speechAdSkipMode.setOnClickListener(this::selectSpeechAdSkipMode);
         mBinding.autoSkipIntroOutro.setOnClickListener(this::setAutoSkipIntroOutro);
         mBinding.introSkipKinds.setOnClickListener(view -> IntroSkipKinds.show(requireActivity(), this::setText));
+        mBinding.directInterface.setOnClickListener(this::setDirectInterface);
+        mBinding.directInterfaceUrl.setOnClickListener(this::editDirectInterfaceUrl);
+        mBinding.siteRuleManage.setOnClickListener(view -> manageSiteRules());
     }
 
     private void setText() {
@@ -141,6 +151,11 @@ public class SettingAdFragment extends BaseFragment {
         });
         safeSet("autoSkipIntroOutro", mBinding.autoSkipIntroOutroText, () -> introSkipMode[Setting.getIntroSkipMode()]);
         safeSet("introSkipKinds", mBinding.introSkipKindsText, IntroSkipKinds::summary);
+        safeSet("directInterface", mBinding.directInterfaceText, () -> getSwitch(Setting.isDirectInterface()));
+        safeSet("directInterfaceUrl", mBinding.directInterfaceUrlText, () -> Setting.getDirectInterfaceUrl().isEmpty()
+                ? getString(R.string.setting_off) : Setting.getDirectInterfaceUrl());
+        safeSet("siteRuleManage", mBinding.siteRuleManageText, () -> getString(R.string.setting_site_rule_count,
+                SiteRuleConfig.load().size()));
     }
 
     private boolean canSetText() {
@@ -419,6 +434,264 @@ public class SettingAdFragment extends BaseFragment {
                     setText();
                     dialog.dismiss();
                 }).show();
+    }
+
+    private void setDirectInterface(View view) {
+        Setting.putDirectInterface(!Setting.isDirectInterface());
+        setText();
+    }
+
+    private void editDirectInterfaceUrl(View view) {
+        EditText input = new EditText(requireContext());
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        input.setText(Setting.getDirectInterfaceUrl());
+        input.setSelection(input.length());
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(R.string.setting_direct_interface_url)
+                .setMessage(R.string.setting_direct_interface_url_hint)
+                .setView(input)
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            Setting.putDirectInterfaceUrl(input.getText().toString());
+            setText();
+            dialog.dismiss();
+        }));
+        dialog.show();
+        LightDialog.apply(dialog);
+    }
+
+    private void manageSiteRules() {
+        new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(R.string.setting_site_rule_manage)
+                .setItems(ruleItems(), (dialog, which) -> {
+                    List<SiteRule> rules = SiteRuleConfig.load();
+                    int syncIndex = rules.size();
+                    int configIndex = rules.size() + 1;
+                    if (which >= 0 && which < rules.size()) editSiteRule(rules.get(which));
+                    else if (which == syncIndex) syncSiteRules();
+                    else if (which == configIndex) configSync();
+                })
+                .setNeutralButton(R.string.site_rule_test, (dialog, which) -> probeSiteRule())
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.site_rule_add, (dialog, which) -> editSiteRule(SiteRule.create()))
+                .show();
+    }
+
+    private String[] ruleItems() {
+        List<SiteRule> rules = SiteRuleConfig.load();
+        String[] items = new String[rules.size() + 2];
+        for (int i = 0; i < rules.size(); i++) {
+            SiteRule rule = rules.get(i);
+            String state = rule.isEnabled() ? getString(R.string.site_rule_enable) : getString(R.string.site_rule_disable);
+            items[i] = rule.getDomain().isEmpty() ? rule.getName() + " (" + state + ")" : rule.getName() + " · " + rule.getDomain() + " (" + state + ")";
+        }
+        items[rules.size()] = getString(R.string.site_rule_sync);
+        items[rules.size() + 1] = getString(R.string.site_rule_sync_config);
+        return items;
+    }
+
+    private void editSiteRule(SiteRule rule) {
+        if (rule == null) return;
+        String[] detectTypes = {SiteRule.DETECT_BOTH, SiteRule.DETECT_DURATION, SiteRule.DETECT_HASH, SiteRule.DETECT_DIRECT};
+        String[] methods = {SiteRule.METHOD_AUTO, SiteRule.METHOD_SEQUENCE, SiteRule.METHOD_BLOCKCUT, SiteRule.METHOD_SLICEBATCH,
+                SiteRule.METHOD_SHORTBLOCK, SiteRule.METHOD_FINGERPRINT, SiteRule.METHOD_BOTH, SiteRule.METHOD_HASH};
+        String[] indexModes = {SiteRule.INDEX_AUTO, SiteRule.INDEX_SINGLE, SiteRule.INDEX_FIXED};
+        String[] bitrates = {SiteRule.BITRATE_FIRST, SiteRule.BITRATE_HIGHEST, SiteRule.BITRATE_LOWEST};
+        android.widget.LinearLayout form = new android.widget.LinearLayout(requireContext());
+        form.setOrientation(android.widget.LinearLayout.VERTICAL);
+        form.setPadding(48, 8, 48, 8);
+        EditText name = new EditText(requireContext()); name.setHint(R.string.site_rule_add); name.setText(rule.getName());
+        EditText domain = new EditText(requireContext()); domain.setHint(R.string.site_rule_field_domain); domain.setText(rule.getDomain());
+        android.widget.Spinner detectType = new android.widget.Spinner(requireContext());
+        detectType.setAdapter(new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, detectTypes));
+        detectType.setSelection(indexOf(detectTypes, rule.getDetectType()));
+        android.widget.Spinner detectMethod = new android.widget.Spinner(requireContext());
+        detectMethod.setAdapter(new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, methods));
+        detectMethod.setSelection(indexOf(methods, rule.getDetectMethod()));
+        android.widget.Spinner indexMode = new android.widget.Spinner(requireContext());
+        indexMode.setAdapter(new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, indexModes));
+        indexMode.setSelection(indexOf(indexModes, rule.getIndexMode()));
+        android.widget.Spinner bitrate = new android.widget.Spinner(requireContext());
+        bitrate.setAdapter(new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, bitrates));
+        bitrate.setSelection(indexOf(bitrates, rule.getBitrate()));
+        EditText fixedPath = new EditText(requireContext()); fixedPath.setHint(R.string.site_rule_field_fixed_path); fixedPath.setText(rule.getFixedPath());
+        EditText proxy = new EditText(requireContext()); proxy.setHint(R.string.site_rule_field_proxy); proxy.setText(rule.getProxyUrl());
+        EditText cacheDir = new EditText(requireContext()); cacheDir.setHint(R.string.site_rule_field_cache_dir); cacheDir.setText(rule.getCacheDir());
+        EditText sortCode = new EditText(requireContext()); sortCode.setInputType(InputType.TYPE_CLASS_NUMBER); sortCode.setHint(R.string.site_rule_field_sort_code);
+        sortCode.setText(String.valueOf(rule.getSortCode()));
+        EditText prefixes = new EditText(requireContext()); prefixes.setHint(R.string.site_rule_field_url_prefixes); prefixes.setText(String.join("\n", rule.getUrlPrefixes()));
+        EditText regexes = new EditText(requireContext()); regexes.setHint(R.string.site_rule_field_url_regexes); regexes.setText(String.join("\n", rule.getUrlRegexes()));
+        EditText fingerprints = new EditText(requireContext()); fingerprints.setHint(R.string.site_rule_field_fingerprints); fingerprints.setText(String.join("\n", rule.getFingerprints()));
+        EditText adRegexes = new EditText(requireContext()); adRegexes.setHint(R.string.site_rule_field_ad_regexes); adRegexes.setText(String.join("\n", rule.getAdRegexes()));
+        form.addView(label(R.string.site_rule_edit)); form.addView(name);
+        form.addView(label(R.string.site_rule_field_domain)); form.addView(domain);
+        form.addView(label(R.string.site_rule_field_detect_type)); form.addView(detectType);
+        form.addView(label(R.string.site_rule_field_detect_method)); form.addView(detectMethod);
+        form.addView(label(R.string.site_rule_field_index_mode)); form.addView(indexMode);
+        form.addView(label(R.string.site_rule_field_bitrate)); form.addView(bitrate);
+        form.addView(label(R.string.site_rule_field_fixed_path)); form.addView(fixedPath);
+        form.addView(label(R.string.site_rule_field_proxy)); form.addView(proxy);
+        form.addView(label(R.string.site_rule_field_cache_dir)); form.addView(cacheDir);
+        form.addView(label(R.string.site_rule_field_sort_code)); form.addView(sortCode);
+        form.addView(label(R.string.site_rule_field_url_prefixes)); form.addView(prefixes);
+        form.addView(label(R.string.site_rule_field_url_regexes)); form.addView(regexes);
+        form.addView(label(R.string.site_rule_field_fingerprints)); form.addView(fingerprints);
+        form.addView(label(R.string.site_rule_field_ad_regexes)); form.addView(adRegexes);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
+        scroll.addView(form);
+        boolean creating = rule.getId().isEmpty();
+        AlertDialog editDialog = new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(creating ? R.string.site_rule_add : R.string.site_rule_edit)
+                .setView(scroll)
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .setNeutralButton(R.string.site_rule_remove, (d, w) -> {
+                    SiteRuleConfig.delete(rule.getId());
+                    Notify.show(R.string.site_rule_deleted);
+                    setText();
+                })
+                .create();
+        editDialog.setOnShowListener(ignored -> editDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            SiteRule saved = collect(rule, name, domain, detectType, detectMethod, indexMode, bitrate,
+                    fixedPath, proxy, cacheDir, sortCode, prefixes, regexes, fingerprints, adRegexes);
+            if (saved.getDomain().isEmpty()) {
+                Notify.show(R.string.site_rule_invalid);
+                return;
+            }
+            boolean exists = SiteRuleConfig.load().stream().anyMatch(r -> r.getId().equals(saved.getId()));
+            if (exists) SiteRuleConfig.update(saved); else SiteRuleConfig.add(saved);
+            Notify.show(R.string.site_rule_saved);
+            setText();
+            editDialog.dismiss();
+        }));
+        editDialog.show();
+        LightDialog.apply(editDialog);
+    }
+
+    private android.widget.TextView label(int res) {
+        com.google.android.material.textview.MaterialTextView text = new com.google.android.material.textview.MaterialTextView(requireContext());
+        text.setText(res);
+        text.setTextSize(14f);
+        text.setTextColor(0xFF888888);
+        text.setPadding(0, 16, 0, 4);
+        return text;
+    }
+
+    private SiteRule collect(SiteRule base, EditText name, EditText domain, android.widget.Spinner detectType,
+                             android.widget.Spinner detectMethod, android.widget.Spinner indexMode, android.widget.Spinner bitrate,
+                             EditText fixedPath, EditText proxy, EditText cacheDir, EditText sortCode,
+                             EditText prefixes, EditText regexes, EditText fingerprints, EditText adRegexes) {
+        base.setName(name.getText().toString().trim());
+        base.setDomain(domain.getText().toString().trim().replaceFirst("^https?://", ""));
+        if (detectType.getSelectedItem() != null) base.setDetectType(detectType.getSelectedItem().toString());
+        if (detectMethod.getSelectedItem() != null) base.setDetectMethod(detectMethod.getSelectedItem().toString());
+        if (indexMode.getSelectedItem() != null) base.setIndexMode(indexMode.getSelectedItem().toString());
+        if (bitrate.getSelectedItem() != null) base.setBitrate(bitrate.getSelectedItem().toString());
+        base.setFixedPath(fixedPath.getText().toString().trim());
+        base.setProxyUrl(proxy.getText().toString().trim());
+        base.setCacheDir(cacheDir.getText().toString().trim());
+        try { base.setSortCode(Integer.parseInt(sortCode.getText().toString().trim())); } catch (Throwable ignored) {}
+        base.setUrlPrefixes(splitLines(prefixes.getText().toString()));
+        base.setUrlRegexes(splitLines(regexes.getText().toString()));
+        base.setFingerprints(splitLines(fingerprints.getText().toString()));
+        base.setAdRegexes(splitLines(adRegexes.getText().toString()));
+        return base;
+    }
+
+    private List<String> splitLines(String text) {
+        List<String> out = new ArrayList<>();
+        for (String line : text.split("\n")) {
+            String v = line.trim();
+            if (!v.isEmpty()) out.add(v);
+        }
+        return out;
+    }
+
+    private int indexOf(String[] array, String value) {
+        for (int i = 0; i < array.length; i++) if (array[i].equals(value)) return i;
+        return 0;
+    }
+
+    private void probeSiteRule() {
+        EditText input = new EditText(requireContext());
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        input.setHint(R.string.site_rule_test_url);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(R.string.site_rule_test)
+                .setMessage(R.string.site_rule_test_hint)
+                .setView(input)
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            String url = input.getText().toString().trim();
+            if (url.isEmpty()) return;
+            dialog.dismiss();
+            Notify.show(R.string.site_rule_test_running);
+            Task.execute(() -> {
+                SiteRuleAnalyzer.Result result = SiteRuleAnalyzer.analyze(url);
+                App.post(() -> {
+                    if (!canSetText()) return;
+                    if (result == null || !result.ok() || result.candidate == null) {
+                        Notify.show(getString(R.string.site_rule_test_failed, result == null ? "" : result.error));
+                        setText();
+                        return;
+                    }
+                    Notify.show(getString(R.string.site_rule_test_done, result.segmentCount,
+                            result.candidate.getFingerprints().size(), result.discontinuityCount));
+                    SiteRuleConfig.add(result.candidate);
+                    setText();
+                });
+            });
+        }));
+        dialog.show();
+        LightDialog.apply(dialog);
+    }
+
+    private void syncSiteRules() {
+        if (!RuleSync.isConfigured()) {
+            configSync();
+            return;
+        }
+        String json = App.gson().toJson(SiteRuleConfig.load());
+        Notify.show(R.string.site_rule_test_running);
+        Task.execute(() -> {
+            String error = RuleSync.push(json);
+            App.post(() -> {
+                if (!canSetText()) return;
+                if (error == null) Notify.show(R.string.site_rule_sync_done);
+                else Notify.show(getString(R.string.site_rule_sync_fail, error));
+            });
+        });
+    }
+
+    private void configSync() {
+        EditText repo = new EditText(requireContext()); repo.setSingleLine(true); repo.setHint(R.string.site_rule_sync_repo); repo.setText(Setting.getRuleSyncRepo());
+        EditText token = new EditText(requireContext()); token.setSingleLine(true); token.setHint(R.string.site_rule_sync_token); token.setText(Setting.getRuleSyncToken());
+        EditText path = new EditText(requireContext()); path.setSingleLine(true); path.setHint(R.string.site_rule_sync_path); path.setText(Setting.getRuleSyncPath());
+        android.widget.LinearLayout form = new android.widget.LinearLayout(requireContext());
+        form.setOrientation(android.widget.LinearLayout.VERTICAL);
+        form.setPadding(48, 8, 48, 8);
+        form.addView(repo); form.addView(token); form.addView(path);
+        AlertDialog syncDialog = new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(R.string.site_rule_sync_config)
+                .setView(form)
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        syncDialog.setOnShowListener(ignored -> syncDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            Setting.putRuleSyncRepo(repo.getText().toString());
+            Setting.putRuleSyncToken(token.getText().toString());
+            Setting.putRuleSyncPath(path.getText().toString());
+            setText();
+            syncDialog.dismiss();
+        }));
+        syncDialog.show();
+        LightDialog.apply(syncDialog);
     }
 
     private void notifyAdAudioRuntime() {
