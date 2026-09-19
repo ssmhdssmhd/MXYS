@@ -88,22 +88,23 @@
 
 版本号规则：`v.0.0.1`，百位进一（如 `v.0.0.99` 之后为 `v.0.1.0`）
 
-当前版本：**v.0.0.5**
+当前版本：**v.0.0.6**
 
 ## 📝 更新日志
 
-### v.0.0.5 (2026-09-19)
+### v.0.0.6 (2026-09-19)
+- ✅ **版本统一**：消除 v0.0.4/v0.0.5 同日重复记录，版本链为 v0.0.3 → v0.0.5 → **v0.0.6**，与 Releases 发行版严格一一对应
 - ✅ **新增「直走接口」**（设置 → 去广告 → 直走接口，默认**关闭**）：开启后所有 `.m3u8` 播放都交给配置的接口去广告，接口不可用时自动回退本地 HLS 清洗
 - ✅ **新增「资源站规则」**（直走接口下方）：每站点可配置域名 / 检测解析类型（both·duration·hash·direct）/ 检测方式（auto·sequence·blockcut·slicebatch·shortblock·fingerprint·both·hash）/ 索引方式（auto·single·fixed）/ 码率选择（first·highest·lowest）/ 固定子路径 / 站点级代理 / URL 匹配前缀+正则 / 缓存子目录 / 排序码 / 广告时长特征码（多组）/ 广告过滤正则
 - ✅ **新增「在线测试」**：输入视频链接自动下载 m3u8 与采样片段分析，生成候选资源站规则，可直接编辑/删除（分析需真实下载）
 - ✅ **新增「规则同步」**：把资源站规则上传到公开仓库 `GZ/rules.json`（GitHub Contents API，仓库/Token 在设置内配置，不写死）
-- ✅ **发行版整理**：清理全部历史杂散 Release，只保留当前 0.0.5 一个正式发行版
-- ✅ 版本 v0.0.5（versionCode 565），签名 v1+v2+v3 齐全
-- 发布包：`MoxiTVBox.0.0.5.{时间}-leanback/mobile-arm64_v8a.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 下载）
+- 版本 v0.0.6（versionCode 566），签名 v1+v2+v3 齐全
+- 发布包：`MoxiTVBox.0.0.6.{时间}-leanback/mobile-arm64_v8a.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 下载）
 
-### v.0.0.4 (2026-09-19)
+### v.0.0.5 (2026-09-19)
 - ✅ 修复**安装包无法安装**问题：强制启用 **v1+v2+v3 签名**（`app/build.gradle`），兼容所有 Android 版本
 - ✅ 修复中文环境下应用名显示为「湯影视」的问题：`app_name` 统一为 **沫兮TVBox / 沫兮TVBox-TV**
+- ✅ 发行版整理：清理历史杂散 Release，只保留当前一个正式发行版
 - ✅ README 新增「发行版编译来源」说明
 
 ### v.0.0.3 (2026-09-18)
