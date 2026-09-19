@@ -93,10 +93,13 @@
 ## 📝 更新日志
 
 ### v.0.0.5 (2026-09-19)
-- ✅ **发行版整理**：清理全部历史杂散 Release（0.0.2/0.0.3/0.0.4 重复包、MXGTV 旧版、空包），**只保留当前 0.0.5 一个正式发行版**，版本号与 README 严格一致
-- ✅ 版本升至 v0.0.5（versionCode 565），APK 命名 `MoxiTVBox.{版本}.{时间}-{flavor}.apk`
-- ✅ 签名已校验为 **v1+v2+v3** 齐全（`META-INF/CERT.RSA` v1 签名存在 + v2/v3 签名块）
-- 发布包：`MoxiTVBox.0.0.5.{时间}-leanback/mobile-arm64_v8a.apk`
+- ✅ **新增「直走接口」**（设置 → 去广告 → 直走接口，默认**关闭**）：开启后所有 `.m3u8` 播放都交给配置的接口去广告，接口不可用时自动回退本地 HLS 清洗
+- ✅ **新增「资源站规则」**（直走接口下方）：每站点可配置域名 / 检测解析类型（both·duration·hash·direct）/ 检测方式（auto·sequence·blockcut·slicebatch·shortblock·fingerprint·both·hash）/ 索引方式（auto·single·fixed）/ 码率选择（first·highest·lowest）/ 固定子路径 / 站点级代理 / URL 匹配前缀+正则 / 缓存子目录 / 排序码 / 广告时长特征码（多组）/ 广告过滤正则
+- ✅ **新增「在线测试」**：输入视频链接自动下载 m3u8 与采样片段分析，生成候选资源站规则，可直接编辑/删除（分析需真实下载）
+- ✅ **新增「规则同步」**：把资源站规则上传到公开仓库 `GZ/rules.json`（GitHub Contents API，仓库/Token 在设置内配置，不写死）
+- ✅ **发行版整理**：清理全部历史杂散 Release，只保留当前 0.0.5 一个正式发行版
+- ✅ 版本 v0.0.5（versionCode 565），签名 v1+v2+v3 齐全
+- 发布包：`MoxiTVBox.0.0.5.{时间}-leanback/mobile-arm64_v8a.apk`（[Releases](https://github.com/ssmhdssmhd/MXYS/releases) 下载）
 
 ### v.0.0.4 (2026-09-19)
 - ✅ 修复**安装包无法安装**问题：强制启用 **v1+v2+v3 签名**（`app/build.gradle`），兼容所有 Android 版本
