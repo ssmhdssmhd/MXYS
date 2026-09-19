@@ -570,7 +570,7 @@ public class SettingAdActivity extends BaseActivity {
             if (exists) SiteRuleConfig.update(saved); else SiteRuleConfig.add(saved);
             Notify.show(R.string.site_rule_saved);
             setText();
-            shown.dismiss();
+            editDialog.dismiss();
         }));
         editDialog.show();
         LightDialog.apply(editDialog);
@@ -693,7 +693,7 @@ public class SettingAdActivity extends BaseActivity {
             Setting.putRuleSyncToken(token.getText().toString());
             Setting.putRuleSyncPath(path.getText().toString());
             setText();
-            shown.dismiss();
+            syncDialog.dismiss();
         }));
         syncDialog.show();
         LightDialog.apply(syncDialog);
