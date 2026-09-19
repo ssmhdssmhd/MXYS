@@ -559,7 +559,7 @@ public class SettingAdActivity extends BaseActivity {
                     setText();
                 })
                 .create();
-        editDialog.setOnShowListener(shown -> shown.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+        editDialog.setOnShowListener(ignored -> editDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
             SiteRule saved = collect(rule, name, domain, detectType, detectMethod, indexMode, bitrate,
                     fixedPath, proxy, cacheDir, sortCode, prefixes, regexes, fingerprints, adRegexes);
             if (saved.getDomain().isEmpty()) {
@@ -688,7 +688,7 @@ public class SettingAdActivity extends BaseActivity {
                 .setNegativeButton(R.string.dialog_negative, null)
                 .setPositiveButton(R.string.dialog_positive, null)
                 .create();
-        syncDialog.setOnShowListener(shown -> shown.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+        syncDialog.setOnShowListener(ignored -> syncDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
             Setting.putRuleSyncRepo(repo.getText().toString());
             Setting.putRuleSyncToken(token.getText().toString());
             Setting.putRuleSyncPath(path.getText().toString());
