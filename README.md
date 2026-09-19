@@ -59,6 +59,17 @@
 3. 按版本规则更新版本号与更新日志，提交并推送
 4. 在 Actions 手动触发云编译，产物发布到 Releases 供下载
 
+## 📦 发行版编译来源（根据哪个分支编译）
+
+本仓库的发行版由 GitHub Actions 云端编译，**发行版对应的源码分支是固定的**，认准文件名即可知道来源：
+
+| 发行版 | APK 命名 | 编译源码分支 | Workflow | 底座 |
+|---|---|---|---|---|
+| **沫兮TVBox（当前正式版）** | `MoxiTVBox.{版本}.{时间}-{mode}-arm64_v8a.apk` | **[MXTV](https://github.com/ssmhdssmhd/MXYS/tree/MXTV)** | [build-release-fongmi.yml](.github/workflows/build-release-fongmi.yml) | FongMi/tangtv（可云编全家桶，含 mpv/ffmpeg） |
+| 沫兮TVBox（备用回退版） | `MoxiTVBox.{版本}.{时间}-{flavor}.apk` | **[KFTV](https://github.com/ssmhdssmhd/MXYS/tree/KFTV)** | [build-release-tvbox.yml](.github/workflows/build-release-tvbox.yml) | TVBoxOS（纯开源、体积小） |
+
+> **当前正式发行版（v.0.0.3 起）编译自 `MXTV` 分支**；KFTV（TVBoxOS）作为轻量可回退版保留。下载/引用前请留意 Release 的 APK 命名确定来源分支。
+
 ## 🎬 KFTV 开发分支（影视二开）
 
 仓库包含 **`KFTV`** 分支，用于影视二次开发，底座为 **TVBoxOS**（[q215613905/TVBoxOS](https://github.com/q215613905/TVBoxOS)），可纯开源云端构建：
@@ -77,9 +88,13 @@
 
 版本号规则：`v.0.0.1`，百位进一（如 `v.0.0.99` 之后为 `v.0.1.0`）
 
-当前版本：**v.0.0.3**
+当前版本：**v.0.0.4**
 
 ## 📝 更新日志
+
+### v.0.0.4 (2026-09-18)
+- ✅ README 新增「发行版编译来源」说明，明确当前发行版编译自 **MXTV 分支**（build-release-fongmi.yml），备用版编译自 KFTV 分支
+- ✅ 修复中文环境下应用名显示为「湯影视」的问题：main / leanback 的 `values-zh-rCN`、`values-zh-rTW` 中 `app_name` 统一覆盖为 **沫兮TVBox / 沫兮TVBox-TV**
 
 ### v.0.0.3 (2026-09-18)
 - ✅ **切换底座为 FongMi/TV（可云编全家桶）**：采用 `alantang1977/tangtv`（FongMi 私有 Media3 `1.11.0-alpha01-fongmi` AAR + mpv 原生库 + 坑模块 AAR 均已入库），原生 leanback/mobile，**可直接云端编译**
