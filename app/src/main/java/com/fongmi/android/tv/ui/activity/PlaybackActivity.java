@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceView;
