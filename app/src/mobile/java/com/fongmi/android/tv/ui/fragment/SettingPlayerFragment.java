@@ -2,12 +2,15 @@ package com.fongmi.android.tv.ui.fragment;
 
 import android.content.Intent;
 import android.provider.Settings;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -25,6 +28,7 @@ import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
 import com.fongmi.android.tv.ui.dialog.ChoiceDialog;
+import com.fongmi.android.tv.ui.dialog.LightDialog;
 import com.fongmi.android.tv.ui.dialog.LutDialog;
 import com.fongmi.android.tv.ui.dialog.MpvConfigDialog;
 import com.fongmi.android.tv.ui.dialog.PlaybackPerformanceDialog;
@@ -39,6 +43,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 import java.text.DecimalFormat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import is.xyz.mpv.MPVLib;
 
 public class SettingPlayerFragment extends BaseFragment implements UaListener, BufferListener, SpeedListener {
@@ -109,6 +114,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[PlayerSetting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[PlayerSetting.getBackground()]);
         hidePerformanceRows();
+        setSpecialPlayText();
     }
 
     @Override
@@ -150,10 +156,45 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.audioPassThrough.setOnClickListener(this::setAudioPassThrough);
         mBinding.videoDecode.setOnClickListener(this::setVideoDecode);
         mBinding.ffmpegMode.setOnClickListener(this::setFfmpegMode);
+        mBinding.specialPlay.setOnClickListener(this::setSpecialPlay);
+        mBinding.specialPlayUrl.setOnClickListener(this::editSpecialPlayUrl);
     }
 
     private void onUa(View view) {
         UaDialog.show(this);
+    }
+
+    private void setSpecialPlay(View view) {
+        Setting.putSpecialPlay(!Setting.isSpecialPlay());
+        setSpecialPlayText();
+    }
+
+    private void editSpecialPlayUrl(View view) {
+        EditText input = new EditText(requireContext());
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        input.setText(Setting.getSpecialPlayUrl());
+        input.setSelection(input.length());
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity(), R.style.Theme_WebHTV_LightDialog)
+                .setTitle(R.string.setting_special_play_url)
+                .setMessage(R.string.setting_special_play_url_hint)
+                .setView(input)
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+            Setting.putSpecialPlayUrl(input.getText().toString());
+            setSpecialPlayText();
+            dialog.dismiss();
+        }));
+        dialog.show();
+        LightDialog.apply(dialog);
+    }
+
+    private void setSpecialPlayText() {
+        mBinding.specialPlayText.setText(getSwitch(Setting.isSpecialPlay()));
+        mBinding.specialPlayUrlText.setText(Setting.getSpecialPlayUrl().isEmpty()
+                ? getString(R.string.setting_off) : Setting.getSpecialPlayUrl());
     }
 
     @Override

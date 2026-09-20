@@ -2664,4 +2664,9 @@ TVData</string>
     <string name="site_rule_field_fingerprints">Ad duration fingerprints (one group per line)</string>
     <string name="site_rule_field_ad_regexes">Ad filter regexes (one per line)</string>
     <string name="site_rule_invalid">Missing domain, cannot save</string>
+    <string name="setting_special_play">Special Play</string>
+    <string name="setting_special_play_toggle">Special Play switch</string>
+    <string name="setting_special_play_url">Special Play interface URL</string>
+    <string name="setting_special_play_url_hint">When enabled, the video link is first resolved via the configured interface before playback; the returned URL (usually a web player) is opened in the built-in webview. Off by default.</string>
+
 </resources>

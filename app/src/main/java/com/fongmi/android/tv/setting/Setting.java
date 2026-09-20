@@ -818,6 +818,24 @@ public class Setting {
         Prefers.put("direct_interface_url", url == null ? "" : url.trim());
     }
 
+    // ---- 特殊播放（默认关闭）：播放前经接口解析，返回的 url 作为实际播放地址 ----
+
+    public static boolean isSpecialPlay() {
+        return Prefers.getBoolean("special_play_enabled", false);
+    }
+
+    public static void putSpecialPlay(boolean enabled) {
+        Prefers.put("special_play_enabled", enabled);
+    }
+
+    public static String getSpecialPlayUrl() {
+        return Prefers.getString("special_play_url", "http://114.134.184.91:5000/api/parse?url=");
+    }
+
+    public static void putSpecialPlayUrl(String url) {
+        Prefers.put("special_play_url", url == null ? "" : url.trim());
+    }
+
     // ---- 资源站规则远程同步（公开仓库 GZ 文件夹） ----
 
     public static String getRuleSyncRepo() {

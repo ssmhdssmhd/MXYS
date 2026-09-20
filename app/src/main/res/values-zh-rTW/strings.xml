@@ -2629,4 +2629,9 @@ TVData</string>
     <string name="site_rule_field_fingerprints">廣告時長指紋（每行一組，如 5.567, 3.2）</string>
     <string name="site_rule_field_ad_regexes">廣告過濾正則（每行一個）</string>
     <string name="site_rule_invalid">缺少網域，無法儲存</string>
+    <string name="setting_special_play">特殊播放</string>
+    <string name="setting_special_play_toggle">特殊播放开关</string>
+    <string name="setting_special_play_url">特殊播放接口地址</string>
+    <string name="setting_special_play_url_hint">开启后，播放视频前先经「接口 + 视频链接」解析出实际播放地址（通常为网页播放器，用内置网页打开播放）。默认关闭，留空则不启用。</string>
+
 </resources>

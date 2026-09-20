@@ -51,7 +51,10 @@ import com.fongmi.android.tv.ui.dialog.AdSkipPromptPresenter;
 import com.fongmi.android.tv.ui.dialog.VideoAspectModeDialog;
 import com.fongmi.android.tv.ui.novel.NovelRouter;
 import com.fongmi.android.tv.ui.custom.CustomSeekView;
+import com.fongmi.android.tv.ui.web.CatWebActivity;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SpecialPlay;
+import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -416,6 +419,12 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
             if (NovelRouter.routeReaderEngine(this, result, key, getReaderVod())) return;
             return;
         }
+        if (trySpecialPlay(key, result, useParse, timeout, metadata, startPositionMs)) return;
+        startPlayerNormal(key, result, useParse, timeout, metadata, startPositionMs);
+    }
+
+    private void startPlayerNormal(String key, Result result, boolean useParse, long timeout,
+                               MediaMetadata metadata, long startPositionMs) {
         if (rejectUnsupportedDrm(key, result)) {
             return;
         } else if (result.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(result.getDrm().getUUID())) {
@@ -436,6 +445,46 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
             player().start(PlaySpec.from(result, key, metadata), timeout, PlayerSetting.isAutoPlay(), startPositionMs);
         }
         syncKeepScreenOn();
+    }
+
+    /**
+     * 特殊播放（默认关闭）：开启后对播放请求先经配置接口解析出实际播放地址。
+     * 解析返回网页播放器地址 → 用 WebView(CatWebActivity) 打开；返回媒体(address) → 替换地址直接播；
+     * 失败 → 回退正常播放。返回 true 表示已接管（异步进行）。
+     */
+    private boolean trySpecialPlay(String key, Result result, boolean useParse, long timeout,
+                               MediaMetadata metadata, long startPositionMs) {
+        if (!SpecialPlay.isEnabled() || SpecialPlay.endpoint().isEmpty() || result == null) return false;
+        final String realUrl = result.getRealUrl();
+        if (TextUtils.isEmpty(realUrl)) return false;
+        Task.execute(() -> {
+            final String playUrl = SpecialPlay.parse(realUrl);
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (playUrl == null) {
+                    startPlayerNormal(key, result, useParse, timeout, metadata, startPositionMs);
+                    return;
+                }
+                if (looksLikeMedia(playUrl)) {
+                    result.setUrl(playUrl);
+                    startPlayerNormal(key, result, useParse, timeout, metadata, startPositionMs);
+                    return;
+                }
+                try {
+                    startActivity(CatWebActivity.intent(this, playUrl).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                } catch (Throwable e) {
+                    SpiderDebug.log("special-play", e);
+                    startPlayerNormal(key, result, useParse, timeout, metadata, startPositionMs);
+                }
+            });
+        });
+        return true;
+    }
+
+    private boolean looksLikeMedia(String url) {
+        if (url == null) return false;
+        String u = url.toLowerCase();
+        return u.contains(".m3u8") || u.contains(".m3u") || u.contains(".mp4") || u.contains(".flv") || u.contains(".ts");
     }
 
     /**
