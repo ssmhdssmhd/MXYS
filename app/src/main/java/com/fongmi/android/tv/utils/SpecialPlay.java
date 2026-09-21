@@ -62,8 +62,11 @@ public final class SpecialPlay {
         String endpoint = endpoint();
         if (TextUtils.isEmpty(endpoint)) return null;
         if (inCooldown()) return null;
+        // 接口地址若本身已带空 url= 参数，直接拼值即可，避免再拼 &url= 产生重复的空 url 覆盖真实链接
         String separator = endpoint.contains("?") ? "&" : "?";
-        String url = endpoint + separator + "url=" + URLEncoder.encode(playUrl, StandardCharsets.UTF_8);
+        String url = endpoint.endsWith("url=")
+                ? endpoint + URLEncoder.encode(playUrl, StandardCharsets.UTF_8)
+                : endpoint + separator + "url=" + URLEncoder.encode(playUrl, StandardCharsets.UTF_8);
         String text = httpGet(url);
         String resolved = TextUtils.isEmpty(text) ? null : resolve(text);
         if (resolved != null) {
