@@ -472,7 +472,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
                     return;
                 }
                 try {
-                    startActivity(CatWebActivity.intent(this, playUrl).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    startActivity(CatWebActivity.playerIntent(this, playUrl).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 } catch (Throwable e) {
                     SpiderDebug.log("special-play", e);
                     startPlayerNormal(key, result, useParse, timeout, metadata, startPositionMs);

@@ -43,6 +43,8 @@ public class CatWebActivity extends AppCompatActivity {
     /** 不带 TV- 前缀：SpiderDebug 自己会加，与 cat-msg / cat-source 保持一致。 */
     private static final String TAG = "cat-web";
     private static final String EXTRA_URL = "url";
+    /** 特殊播放等打开“只看一次”的页面时置位：返回键直接关闭，不做 WebView 回退重载。 */
+    private static final String EXTRA_CLOSE_ON_BACK = "close_on_back";
 
     private WebView webView;
     private ProgressBar progress;
@@ -58,6 +60,11 @@ public class CatWebActivity extends AppCompatActivity {
         return new Intent(context, CatWebActivity.class).putExtra(EXTRA_URL, url);
     }
 
+    /** 特殊播放的播放页入口：返回即关闭，避免回退重载已经失败的播放器页面。 */
+    public static Intent playerIntent(Context context, String url) {
+        return intent(context, url).putExtra(EXTRA_CLOSE_ON_BACK, true);
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +72,18 @@ public class CatWebActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cat_web);
 
         String url = getIntent().getStringExtra(EXTRA_URL);
+        boolean closeOnBack = getIntent().getBooleanExtra(EXTRA_CLOSE_ON_BACK, false);
         if (TextUtils.isEmpty(url)) {
             finish();
             return;
         }
 
-        // Android 13+ 手势返回与系统返回键都先让 WebView 回退，退到底再关页面
+        // Android 13+ 手势返回与系统返回键都先让 WebView 回退，退到底再关页面；
+        // 特殊播放标记(closeOnBack)时直接关闭，不回退重载已失败的播放器页面
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (webView != null && webView.canGoBack()) webView.goBack();
+                if (!closeOnBack && webView != null && webView.canGoBack()) webView.goBack();
                 else finish();
             }
         });
@@ -268,7 +277,8 @@ public class CatWebActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) webView.goBack();
+        boolean closeOnBack = getIntent().getBooleanExtra(EXTRA_CLOSE_ON_BACK, false);
+        if (!closeOnBack && webView != null && webView.canGoBack()) webView.goBack();
         else finish();
     }
 
