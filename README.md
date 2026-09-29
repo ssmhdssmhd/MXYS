@@ -1,6 +1,11 @@
 # WebHomeTV
 
-> **当前版本:v0.0.14 (574)**
+> **当前版本:v0.0.15 (575)**
+
+### 更新日志
+
+- **v0.0.15 (575)** · 2026-09-29 · 发行版重新打包:基于当前 MXTV 源码(含全部既有功能:WebHome 首页、管理页面、远程托管、观影记录同步等)云端编译 **leanback(电视版) + mobile(手机版)** arm64 release APK,正式签名同名可覆盖更新。
+- **v0.0.14 (574)** · 2026-09-29 · 新增 PHP 单文件 html-relay 站点解析中转(`域名/?url=` 直接调用),完善 Cloudflare 类播放页解析方案。
 
 WebHomeTV 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次开发的 Android 影音应用,保留原有点播、直播、Spider、解析、投屏、本地 HTTP 服务等能力,并重点增强了 **WebHome 自定义首页**、**App Native SDK**、**管理页面**、**远程托管**、**WebHome 扩展**、**登录态学习/同步**、**网盘链接检测**、**站点健康排序**、**观影记录同步** 和 **Nostr/TMDB 推荐首页**。
 
