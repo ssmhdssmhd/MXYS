@@ -132,21 +132,22 @@ if (!$step2['success']) {
     exit;
 }
 
-// 最终输出：采用第一次请求返回的完整内容（示例格式，原样输出）
-$output = $step1['content'];
-
-// 若第一次返回不是 JSON 或缺少关键字段，则组装固定格式兜底
-$decoded = json_decode($output, true);
-if (!is_array($decoded) || !isset($decoded['url']) || empty($decoded['url'])) {
-    $elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
-    $output = json_encode(array(
-        'code' => 200,
-        'msg' => $parsed_url,
-        'url' => $parsed_url,
-        'time' => $elapsed_ms,
-        'KFZ' => '沫兮官替系统',
-        'source' => $source,
-    ), JSON_UNESCAPED_SLASHES);
+// 从第二步返回中提取可播放的 m3u8 流地址
+$stream_url = $parsed_url; // 兜底：拿不到时用官替地址
+$step2_content = json_decode($step2['content'], true);
+if (is_array($step2_content) && isset($step2_content['url']) && !empty($step2_content['url'])) {
+    $stream_url = $step2_content['url'];
 }
 
-echo $output;
+// 计算整体耗时（毫秒）
+$elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
+
+// 最终输出：m3u8 流地址填入 msg 和 url 字段（示例格式）
+echo json_encode(array(
+    'code' => 200,
+    'msg' => $stream_url,
+    'url' => $stream_url,
+    'time' => $elapsed_ms,
+    'KFZ' => '沫兮官替系统',
+    'source' => $source,
+), JSON_UNESCAPED_SLASHES);
