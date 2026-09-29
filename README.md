@@ -1,5 +1,7 @@
 # WebHomeTV
 
+> **当前版本:v0.0.13 (573)**
+
 WebHomeTV 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次开发的 Android 影音应用,保留原有点播、直播、Spider、解析、投屏、本地 HTTP 服务等能力,并重点增强了 **WebHome 自定义首页**、**App Native SDK**、**管理页面**、**远程托管**、**WebHome 扩展**、**登录态学习/同步**、**网盘链接检测**、**站点健康排序**、**观影记录同步** 和 **Nostr/TMDB 推荐首页**。
 
 项目的核心目标不是替换 CSP/Spider 体系,而是让 CSP 站点首页变成一个真正可开发的网页应用:开发者用 HTML/CSS/JavaScript 定制首页,再通过 App 暴露的 Native 能力完成搜索、播放、跨域请求、资源代理、最近观看、网盘检测和状态同步。
@@ -17,6 +19,7 @@ WebHomeTV 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次
 - **登录态学习**:用户手动开启后学习 Cookie、Token、接口 Jar 网盘登录文件等登录态路径,待确认项可在管理页查看/编辑,并可参与一键同步。
 - **APP 代理**:配置代理地址和域名匹配规则,可按当前站点自动建议代理域名,用于改善特定站点、接口或播放链路的网络访问。
 - **调试日志**:本机和局域网日志查看入口,便于排查播放、代理、站源和 WebHome 相关问题。
+- **HTML→m3u8 站点解析中转(Experimental)**:针对部分资源站播放页被 Cloudflare UA 校验、导致 App 默认 UA 抓页被 302 拦截而"播放地址解析失败"的情况,仓库新增无依赖的 Edge 中转(`serverless/webhtv-remote-deno/html-relay.js`)。中转用浏览器 UA 抓播放页、提取真实 `index.m3u8?sign=...` 直链并返回标准 JSON,可在 WebHTV 中直接作为 type=1 JSON 解析接口使用,无需修改 APK。支持 Deno Deploy / Vercel / Cloudflare Workers。详见 [html-relay 使用说明](serverless/webhtv-remote-deno/README.html-relay.md)。
 
 以上能力集中在设置页的"增强功能"入口,手机端和电视端均为独立设置页。
 
