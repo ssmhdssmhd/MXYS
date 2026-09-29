@@ -2,7 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node --check main.js && node --check relay.js && node --check playback-sync.js && node --check playback-store.js",
+    "check": "node --check main.js && node --check relay.js && node --check playback-sync.js && node --check playback-store.js && node --check html-relay.js",
     "test": "node --test test/*.test.js"
   }
 }
