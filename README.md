@@ -46,6 +46,16 @@
 | [TV](https://github.com/ssmhdssmhd/MXYS/tree/TV) | FongMi/TV | fongmi | 影视TV 上游原版（盒端播放器，含私有 media3，云端不可自编，作参考） |
 | [Xiaomi-Tools](https://github.com/ssmhdssmhd/MXYS/tree/Xiaomi-Tools) | FongMi/Xiaomi-Tools | main | 小米工具 |
 
+### 🤖 AI 编程工作分支（trae/agent-*，勿长期保留）
+
+| 分支 | 用处 | 说明 |
+|---|---|---|
+| trae/agent-dXXYRO | AI 编程助手（Trae Agent）工作分支 | 由 Trae 自动创建，用于存放 AI 生成的代码（如 mx.php）；代码验证通过后**快进合并到 main**，该分支可随时清理 |
+| trae/agent-Yc37OO | AI 编程助手（Trae Agent）工作分支 | 同上，属临时工作分支，合并到 main 后可清理 |
+
+> **trae/agent-\* 是什么**：这是 Trae AI 编程助手执行任务时自动创建的临时工作分支，非本仓库正式分支。
+> 规则：**AI 生成的代码一律合并/提交到 `main`**，trae 分支仅作为中间载体，任务完成后不再保留。
+
 ## 🔄 自动同步更新
 
 - GitHub Actions 工作流：[.github/workflows/sync-upstream.yml](.github/workflows/sync-upstream.yml)
