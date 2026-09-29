@@ -119,7 +119,7 @@ if (empty($parsed_url)) {
     exit;
 }
 
-// 第二步：把拿到的 url 传给第二个接口
+// 第二步：把拿到的官替 url 传给第二个接口（跳转获取可播放地址）
 $step2 = http_get($second_url . urlencode($parsed_url));
 
 if (!$step2['success']) {
@@ -132,15 +132,21 @@ if (!$step2['success']) {
     exit;
 }
 
-// 计算整体耗时（毫秒）
-$elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
+// 最终输出：采用第一次请求返回的完整内容（示例格式，原样输出）
+$output = $step1['content'];
 
-// 按固定格式输出
-echo json_encode(array(
-    'code' => 200,
-    'msg' => $parsed_url,
-    'url' => $parsed_url,
-    'time' => $elapsed_ms,
-    'KFZ' => '沫兮官替系统',
-    'source' => $source,
-), JSON_UNESCAPED_SLASHES);
+// 若第一次返回不是 JSON 或缺少关键字段，则组装固定格式兜底
+$decoded = json_decode($output, true);
+if (!is_array($decoded) || !isset($decoded['url']) || empty($decoded['url'])) {
+    $elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
+    $output = json_encode(array(
+        'code' => 200,
+        'msg' => $parsed_url,
+        'url' => $parsed_url,
+        'time' => $elapsed_ms,
+        'KFZ' => '沫兮官替系统',
+        'source' => $source,
+    ), JSON_UNESCAPED_SLASHES);
+}
+
+echo $output;
