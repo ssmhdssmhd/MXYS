@@ -16,7 +16,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+$request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+if ($request_method === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
@@ -26,6 +27,9 @@ $first_url = 'http://114.134.184.91:9005/?url=';
 
 // 第二步接口地址
 $second_url = 'http://114.134.184.91:9005/mx.php?url=';
+
+// 用户传入的源 url
+$input_url = isset($_GET['url']) ? trim($_GET['url']) : '';
 
 /**
  * 发起 HTTP 请求获取内容
@@ -58,8 +62,19 @@ function http_get($url) {
     );
 }
 
-// 第一步：先调用第一个接口（不带参数，原样请求）
-$step1 = http_get($first_url);
+// 缺少 url 参数，直接返回错误
+if (empty($input_url)) {
+    echo json_encode(array(
+        'code' => 400,
+        'msg' => '缺少 url 参数',
+        'url' => '',
+        'time' => 0,
+    ), JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+// 第一步：先调用第一个接口，把用户 url 传进去
+$step1 = http_get($first_url . urlencode($input_url));
 
 if (!$step1['success']) {
     // 第一步失败
