@@ -4,11 +4,14 @@
  * 沫兮 - 链接转发/解析接口
  *
  * 流程：
- * 1. 用户调用本文件
- * 2. 本文件先请求 http://114.134.184.91:9005/?url={url} 获取到新的 url
- * 3. 再请求 http://114.134.184.91:9005/mx.php?url={url} 获取最终返回内容
- * 4. 将最终返回内容原样输出
+ * 1. 用户调用本文件 mx.php?url={url}
+ * 2. 先请求 http://114.134.184.91:9005/?url={url} 获取到新的 url
+ * 3. 再把 url 传给 http://114.134.184.91:9005/mx.php?url={url}
+ * 4. 按固定格式输出 json
  */
+
+// 记录脚本开始时间（用于计算耗时 time）
+$start_time = microtime(true);
 
 // 允许跨域
 header('Content-Type: application/json; charset=utf-8');
@@ -89,13 +92,17 @@ if (!$step1['success']) {
 
 $step1_content = json_decode($step1['content'], true);
 
-// 从第一步返回中提取 url
+// 从第一步返回中提取 url 和来源 source
 $parsed_url = '';
+$source = $input_url;
 if (is_array($step1_content)) {
     if (isset($step1_content['url'])) {
         $parsed_url = $step1_content['url'];
     } elseif (isset($step1_content['msg'])) {
         $parsed_url = $step1_content['msg'];
+    }
+    if (isset($step1_content['source']) && !empty($step1_content['source'])) {
+        $source = $step1_content['source'];
     }
 } else {
     // 若返回的不是 JSON，尝试当作纯文本 url 处理
@@ -125,5 +132,15 @@ if (!$step2['success']) {
     exit;
 }
 
-// 将最终返回内容原样输出
-echo $step2['content'];
+// 计算整体耗时（毫秒）
+$elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
+
+// 按固定格式输出
+echo json_encode(array(
+    'code' => 200,
+    'msg' => $parsed_url,
+    'url' => $parsed_url,
+    'time' => $elapsed_ms,
+    'KFZ' => '沫兮官替系统',
+    'source' => $source,
+), JSON_UNESCAPED_SLASHES);
