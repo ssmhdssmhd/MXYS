@@ -76,6 +76,32 @@ if (empty($input_url)) {
     exit;
 }
 
+/**
+ * 直接抓取源播放页提取可播放的 m3u8 地址
+ * 支持绝对地址，也支持 JS 里的相对路径（相对路径自动补全站点域名）
+ */
+function scrape_m3u8($url) {
+    $resp = http_get($url);
+    if (!$resp['success']) {
+        return '';
+    }
+    $html = $resp['content'];
+    // 1) 绝对地址 m3u8
+    if (preg_match('#https?://[^"\'<>\s]+\.m3u8[^"\'<>\s]*#i', $html, $m)) {
+        return trim($m[0]);
+    }
+    // 2) JS/页面中的相对路径（如 const url = "/2025-07-28/xxx/index.m3u8?sign=..."）
+    if (preg_match('#(["\'])(/[^"\']*\.m3u8[^"\']*)\1#i', $html, $m)) {
+        $parts = parse_url($url);
+        $scheme = isset($parts['scheme']) ? $parts['scheme'] : 'https';
+        $host = isset($parts['host']) ? $parts['host'] : '';
+        if ($host !== '') {
+            return trim($scheme . '://' . $host . $m[2]);
+        }
+    }
+    return '';
+}
+
 // 第一步：先调用第一个接口，把用户 url 传进去
 $step1 = http_get($first_url . urlencode($input_url));
 
@@ -109,12 +135,31 @@ if (is_array($step1_content)) {
     $parsed_url = trim($step1_content['content'] ?? '');
 }
 
+// 官替系统没解析出来时，直接抓取源播放页提取 m3u8 兜底
+if (empty($parsed_url)) {
+    $parsed_url = scrape_m3u8($input_url);
+}
+
 if (empty($parsed_url)) {
     echo json_encode(array(
         'code' => 500,
         'msg' => 'no url found in step1 response',
         'url' => '',
         'time' => 0,
+    ), JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+// 已拿到可直接播放的 m3u8 时，跳过第二步直接返回
+if (stripos($parsed_url, '.m3u8') !== false) {
+    $elapsed_ms = round((microtime(true) - $start_time) * 1000, 1);
+    echo json_encode(array(
+        'code' => 200,
+        'msg' => $parsed_url,
+        'url' => $parsed_url,
+        'time' => $elapsed_ms,
+        'KFZ' => '沫兮官替系统',
+        'source' => $source,
     ), JSON_UNESCAPED_SLASHES);
     exit;
 }
@@ -137,6 +182,13 @@ $stream_url = $parsed_url; // 兜底：拿不到时用官替地址
 $step2_content = json_decode($step2['content'], true);
 if (is_array($step2_content) && isset($step2_content['url']) && !empty($step2_content['url'])) {
     $stream_url = $step2_content['url'];
+}
+// 第二步仍拿不到可播放地址时，最后直接抓取源播放页兜底
+if (stripos($stream_url, '.m3u8') === false) {
+    $direct = scrape_m3u8($input_url);
+    if ($direct !== '') {
+        $stream_url = $direct;
+    }
 }
 
 // 计算整体耗时（毫秒）
